@@ -5,8 +5,6 @@ static LIBBACKTRACE: bool = cfg!(feature = "libbacktrace") && !cfg!(target_os = 
 static GIMLI_SYMBOLIZE: bool = cfg!(all(feature = "gimli-symbolize", unix, target_os = "linux"));
 
 #[test]
-// FIXME: This test depends on debuginfo and runs only with debug builds.
-#[cfg(debug_assertions)]
 // FIXME: shouldn't ignore this test on i686-msvc, unsure why it's failing
 #[cfg_attr(all(target_arch = "x86", target_env = "msvc"), ignore)]
 #[rustfmt::skip] // we care about line numbers here
@@ -232,8 +230,6 @@ fn is_serde() {
 }
 
 #[test]
-// FIXME: This test depends on debuginfo and runs only with debug builds.
-#[cfg(debug_assertions)]
 fn sp_smoke_test() {
     let mut refs = vec![];
     recursive_stack_references(&mut refs);
@@ -300,7 +296,7 @@ fn sp_smoke_test() {
                 let r = refs.pop().unwrap();
                 eprintln!("ref = {:p}", r as *const u8);
                 if sp != 0 {
-                    assert!(r > sp);
+                    assert!(r >= sp);
                     if let Some(child_ref) = child_ref {
                         assert!(sp >= child_ref);
                     }
